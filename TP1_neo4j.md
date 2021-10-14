@@ -37,7 +37,14 @@ ORDER BY p1.name ,p2.name
 ```
 
 6. Find someone to introduce Tom Hanks to the director Frank Darabont.
-
+```sql
+MATCH (tom:Person{name:"Tom Hanks"})-[:ACTED_IN]->(m:Movie)<-[:ACTED_IN]-(other:Person)
+WHERE tom<>other
+WITH other AS introducer
+MATCH (introducer)-[:ACTED_IN]->(m2)<-[:DIRECTED]-(frank:Person{name:"Frank Darabont"}) 
+RETURN DISTINCT introducer.name
+ORDER BY introducer.name
+```
 
 7. Find the shortest path of any relationships between Tom Hanks and Meg Ryan
 ```sql
@@ -52,4 +59,20 @@ MATCH (m:Movie)
 WHERE (m.tagline =~ '.*love.*')
 RETURN m.title AS movie_title , m.tagline as tagline
 ORDER BY movie_title
+```
+
+9. Find actors who had multiple roles in a movie (return the actor, the movie and the
+   roles)
+```sql
+MATCH (a:Person) -[acted_in:ACTED_IN]->(m:Movie)
+WITH a,m,collect(acted_in.roles) AS roles
+WHERE size(roles[0]) > 1
+RETURN a.name AS Actor , m.title AS Movie ,  REDUCE(acc="", x in roles[0] | acc + " | " + x) AS Roles
+```
+
+10. Add to all actor nodes a label ACTOR and to all director nodes a label DIRECTOR.
+```sql
+MATCH (a) -[:ACTED_IN]->(m1) , (d)-[:DIRECTED]->(m2)
+SET a.label = "ACTOR", d.label = "DIRECTOR"
+RETURN a,d
 ```
