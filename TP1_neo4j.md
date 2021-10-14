@@ -36,3 +36,20 @@ RETURN p1.name AS actor_1 ,p2.name AS actor_2, REDUCE(acc="", m in movies |  acc
 ORDER BY p1.name ,p2.name 
 ```
 
+6. Find someone to introduce Tom Hanks to the director Frank Darabont.
+
+
+7. Find the shortest path of any relationships between Tom Hanks and Meg Ryan
+```sql
+MATCH (tom:Person {name:"Tom Hanks"}) , (meg:Person {name:"Meg Ryan"}),
+path = shortestpath((tom)-[*..]-(meg))
+RETURN path
+```
+
+8. Find all movies about love
+```sql
+MATCH (m:Movie)
+WHERE (m.tagline =~ '.*love.*')
+RETURN m.title AS movie_title , m.tagline as tagline
+ORDER BY movie_title
+```
